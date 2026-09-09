@@ -1,0 +1,157 @@
+config-version = 2
+start-at-login = true
+auto-reload-config = true
+
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+accordion-padding = 30
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# Mouse follows focus at monitor granularity only.
+# 'monitor-lazy-center' is a no-op when the cursor is already on the target
+# monitor, so it never fights a mouse drag.
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+# Deliberately NOT enabled: while you drag a window onto another monitor, the
+# focus-changed callback warps the cursor to the window's center, which is
+# still computed on the old monitor. The held mouse button then drags the
+# window back, which changes focus again -> windows jump around.
+# on-focus-changed = ['move-mouse window-lazy-center']
+
+automatically-unhide-macos-hidden-apps = false
+focus-follows-mouse.enabled = false
+key-mapping.preset = 'qwerty'
+
+# Only the workspaces you really use. Adjust names to taste.
+persistent-workspaces = ["1", "2", "3", "4", "5", "M", "T"]
+
+gaps.inner.horizontal = 5
+gaps.inner.vertical   = 5
+gaps.outer.left       = 5
+gaps.outer.bottom     = 5
+gaps.outer.top        = 5
+gaps.outer.right      = 5
+
+# ---------------------------------------------------------------------------
+# Monitor assignment. First match wins, so the list is a fallback chain.
+# Check names with: aerospace list-monitors
+# Home:  3 externals (main = the one macOS calls main, secondary = the other,
+#        third picked by regex on its name).
+# Work:  laptop + 2 externals; 'main' falls back to whatever is there.
+# ---------------------------------------------------------------------------
+[workspace-to-monitor-force-assignment]
+1 = ['main']
+2 = ['main']
+3 = ['secondary', 'main']
+4 = ['secondary', 'main']
+5 = ['^(?!.*built-in).*$', 'secondary', 'main']  # any external, else fallback
+M = ['main']
+T = ['secondary', 'main']
+
+# ---------------------------------------------------------------------------
+# App rules. Check IDs with: aerospace list-apps
+# ---------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.calculator'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.ActivityMonitor'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.1password.1password'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'us.zoom.xos'
+run = 'layout floating'
+
+# Example: always send an app to a fixed workspace
+# [[on-window-detected]]
+# if.app-id = 'com.mitchellh.ghostty'
+# run = 'move-node-to-workspace T'
+
+# Dialogs and sheets float automatically; this catches stragglers by title
+[[on-window-detected]]
+if.window-title-regex-substring = '(?i)preferences|settings|about'
+run = 'layout floating'
+
+# Spread new windows across monitors. If the monitor a window lands on already
+# has 3+ windows on its visible workspace, the script moves it to the emptiest
+# monitor that has fewer. It stays put when every monitor is equally full.
+# Threshold: SPREAD_LIMIT in the script.
+[[on-window-detected]]
+if.during-aerospace-startup = false
+run = 'exec-and-forget /Users/kacperserewis/.config/aerospace/spread-window.sh'
+
+# ---------------------------------------------------------------------------
+[mode.main.binding]
+    alt-slash = 'layout tiles horizontal vertical'
+    alt-comma = 'layout accordion horizontal vertical'
+    alt-f = 'fullscreen'
+    alt-shift-f = 'layout floating tiling'
+
+    alt-h = 'focus left'
+    alt-j = 'focus down'
+    alt-k = 'focus up'
+    alt-l = 'focus right'
+
+    alt-shift-h = 'move left'
+    alt-shift-j = 'move down'
+    alt-shift-k = 'move up'
+    alt-shift-l = 'move right'
+
+    alt-minus = 'resize smart -50'
+    alt-equal = 'resize smart +50'
+    alt-shift-minus = 'balance-sizes'
+    alt-shift-equal = 'balance-sizes'
+
+    alt-1 = 'summon-workspace 1'
+    alt-2 = 'summon-workspace 2'
+    alt-3 = 'summon-workspace 3'
+    alt-4 = 'summon-workspace 4'
+    alt-5 = 'summon-workspace 5'
+    alt-m = 'summon-workspace M'
+    alt-t = 'summon-workspace T'
+
+    alt-shift-1 = 'move-node-to-workspace 1'
+    alt-shift-2 = 'move-node-to-workspace 2'
+    alt-shift-3 = 'move-node-to-workspace 3'
+    alt-shift-4 = 'move-node-to-workspace 4'
+    alt-shift-5 = 'move-node-to-workspace 5'
+    alt-shift-m = 'move-node-to-workspace M'
+    alt-shift-t = 'move-node-to-workspace T'
+
+    # --focus-follows-window keeps focus on the window after it moves, so you
+    # can press the same shortcut again to send it one monitor further.
+    alt-shift-left  = 'move-node-to-monitor --focus-follows-window --wrap-around left'
+    alt-shift-right = 'move-node-to-monitor --focus-follows-window --wrap-around right'
+
+    alt-tab = 'workspace-back-and-forth'
+    alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
+    alt-leftSquareBracket  = 'workspace --wrap-around prev'
+    alt-rightSquareBracket = 'workspace --wrap-around next'
+
+    alt-shift-semicolon = 'mode service'
+
+[mode.service.binding]
+    esc = ['reload-config', 'mode main']
+    r = ['flatten-workspace-tree', 'mode main']
+    f = ['layout floating tiling', 'mode main']
+    backspace = ['close-all-windows-but-current', 'mode main']
+
+    alt-shift-h = ['join-with left', 'mode main']
+    alt-shift-j = ['join-with down', 'mode main']
+    alt-shift-k = ['join-with up', 'mode main']
+    alt-shift-l = ['join-with right', 'mode main']
