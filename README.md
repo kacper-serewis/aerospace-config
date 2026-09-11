@@ -45,3 +45,25 @@ an existing layout.
 
 Change the threshold through `LIMIT` in the script. To see what it decides, set
 `SPREAD_LOG` to a file path and every decision is appended to it.
+
+The move is issued without any settle delay. When `on-window-detected` fires the
+window is already in AeroSpace's tree, so `list-windows` resolves its monitor
+straight away; waiting first only makes the window sit visibly on the wrong
+monitor for longer before it jumps.
+
+## When tiling feels slow
+
+A new window sitting at its own size for a second or more, or the remaining
+window not filling the gap after you close one, is usually AeroSpace itself
+rather than this config. The delay grows with how long the process has been
+running. Measured on this machine after three and a half days of uptime: a new
+window took 2.5-4.5 s to be tiled and 1.6 s to refill after a close. Restarting
+AeroSpace brought that back to roughly 0.3-0.5 s and 0.25 s with the same
+config.
+
+```sh
+killall AeroSpace && open -a AeroSpace
+```
+
+Disabling the spreading rule does not change these numbers, so reach for the
+restart before suspecting the rule.
