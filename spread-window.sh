@@ -16,9 +16,10 @@ LOG=${SPREAD_LOG:-}
 win=${AEROSPACE_WINDOW_ID:-}
 [ -n "$win" ] || exit 0
 
-# The window is placed asynchronously; give AeroSpace a moment to settle so we
-# read its real monitor rather than the pre-placement one.
-sleep 0.2
+# No wait before reading: by the time on-window-detected fires, the window is
+# already in AeroSpace's tree and list-windows resolves its monitor. A settle
+# sleep only widens the gap in which you see the window on the wrong monitor
+# before it is moved, so the move is issued as soon as the decision is made.
 
 target=$(
   {
